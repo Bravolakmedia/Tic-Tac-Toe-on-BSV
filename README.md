@@ -1,2 +1,19 @@
-# Tic-Tac-Toe-on-BSV
-A Complete Guide On Creating A Tic Tac Toe React dApp on BSV Blockchain
+# Tic Tac Toe
+
+## Build
+
+```sh
+npm run build
+```
+
+## Testing Locally
+
+```sh
+npm run test
+```
+
+## Run Tests on the Bitcoin Testnet
+
+```sh
+npm run test:testnet
+```
