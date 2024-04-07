@@ -1,11 +1,5 @@
 import { TicTacToe } from './src/contracts/ticTacToe'
-import {
-    bsv,
-    TestWallet,
-    DefaultProvider,
-    sha256,
-    toByteString,
-} from 'scrypt-ts'
+import { bsv, PubKey, toHex, TestWallet, DefaultProvider } from 'scrypt-ts'
 
 import * as dotenv from 'dotenv'
 
@@ -26,7 +20,7 @@ const privateKey = bsv.PrivateKey.fromWIF(process.env.PRIVATE_KEY || '')
 // Prepare signer.
 // See https://scrypt.io/docs/how-to-deploy-and-call-a-contract/#prepare-a-signer-and-provider
 const signer = new TestWallet(
-    privateKey,
+    [privateKey], // Pass privateKey as an array
     new DefaultProvider({
         network: bsv.Networks.testnet,
     })
@@ -36,19 +30,20 @@ async function main() {
     await TicTacToe.loadArtifact()
 
     // TODO: Adjust the amount of satoshis locked in the smart contract:
-    const amount = 1
+    const amount = 1000
 
-    const instance = new TicTacToe(
-        // TODO: Adjust constructor parameter values:
-        sha256(toByteString('hello world', true))
-    )
+    const aliceKey = bsv.PrivateKey.fromRandom('testnet')
+    const bobKey = bsv.PrivateKey.fromRandom('testnet')
+    const alice = PubKey(toHex(aliceKey.publicKey)) // Replace with Alice's public key
+    const bob = PubKey(toHex(bobKey.publicKey)) // Replace with Bob's public key
 
+    const instance = new TicTacToe(alice, bob)
     // Connect to a signer.
     await instance.connect(signer)
 
     // Contract deployment.
     const deployTx = await instance.deploy(amount)
-    console.log(`TicTacToe contract deployed: ${deployTx.id}`)
+    console.log(`TicTacToe contract deployed: ${deployTx}`)
 }
 
 main()
